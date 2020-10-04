@@ -12,3 +12,4 @@
 | `!social`             | all social links                                        |
 | `!twitter`            | links to twitter                                        |
 | `!unpopularopinion`   | Responds with an unpopular tech opinion I hold in tech. |
+| `!xkcd $keyword`      | Responds with an xkcd related to the given keyword.     |
