@@ -27,6 +27,7 @@ func (b *twitchBot) setUpHandlers() {
 	h := map[string]func(args []string) error{}
 	h["!unpopularopinion"] = b.handleUnpopularOpinion
 	h["!dotfiles"] = b.handleDotfiles
+	h["!twitter"] = b.handleTwitter
 	b.handlers = h
 }
 
