@@ -20,7 +20,7 @@ type xkcdData struct {
 
 const linkFormat = "https://xkcd.com/%d/"
 
-func (b *twitchBot) handleXkcd(msg *twitch.PrivateMessage) error {
+func (b *twitchBot) handleXKCD(msg *twitch.PrivateMessage) error {
 	var (
 		ctx = context.Background()
 		err error
@@ -56,14 +56,23 @@ func (b *twitchBot) handleXkcd(msg *twitch.PrivateMessage) error {
 		return err
 	}
 
+	mostRelevantComic := calculateMostRelevantComic(arg, b.xkcdData)
+
+	if mostRelevantComic == 404 {
+		b.respond("There isn't an XKCD for that: https://xkcd.com/404")
+		return nil
+	}
+
+	b.respond("There's an xkcd for that: " + fmt.Sprintf(linkFormat, mostRelevantComic))
+	return nil
+}
+
+func calculateMostRelevantComic(arg string, data []*xkcdData) int {
 	scores := map[int]int{}
-	for _, comic := range b.xkcdData {
+	for _, comic := range data {
 		// title has a weight of 10
 		// Transcript has a weight of 3
 		// alt has a weight of 1
-
-		// TODO: Be smarter here -- ignore new lines, punctuation etc. Probably
-		// have to break out the ol' regex
 		wordsTitle, wordsTranscript, wordsAlt := strings.Split(comic.SafeTitle, " "), strings.Split(comic.Transcript, " "), strings.Split(comic.Alt, " ")
 		for _, word := range wordsTitle {
 			if strings.ToLower(word) == arg {
@@ -89,11 +98,5 @@ func (b *twitchBot) handleXkcd(msg *twitch.PrivateMessage) error {
 		}
 	}
 
-	if mostRelevantComic == 404 {
-		b.respond("There isn't an XKCD for that: https://xkcd.com/404")
-		return nil
-	}
-
-	b.respond("There's an xkcd for that: " + fmt.Sprintf(linkFormat, mostRelevantComic))
-	return nil
+	return mostRelevantComic
 }

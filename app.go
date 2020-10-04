@@ -36,7 +36,7 @@ func (b *twitchBot) setUpHandlers() {
 	h["!social"] = b.handleSocial
 	h["!commands"] = b.handleCommands
 	h["!so"] = b.handleSo
-	h["!xkcd"] = b.handleXkcd
+	h["!xkcd"] = b.handleXKCD
 	b.handlers = h
 }
 
