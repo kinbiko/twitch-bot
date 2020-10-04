@@ -28,11 +28,11 @@ func (b *twitchBot) handleXkcd(msg *twitch.PrivateMessage) error {
 
 	args := strings.Split(msg.Message, " ")
 	if len(args) < 2 {
-		b.respond("There isn't an XKCD for that: https://xkcd.com/404")
+		b.respond("There's no XKCD for that: https://xkcd.com/404")
+		return nil
 	}
-	arg := args[1]
+	arg := strings.ToLower(args[1])
 
-	xkcdDump := []xkcdData{}
 	b.xkcdOnce.Do(func() {
 		jsonFile, err := os.Open("./xkcdump.json")
 		if err != nil {
@@ -46,7 +46,7 @@ func (b *twitchBot) handleXkcd(msg *twitch.PrivateMessage) error {
 			return
 		}
 
-		err = json.Unmarshal(byteValue, &xkcdDump)
+		err = json.Unmarshal(byteValue, &b.xkcdData)
 		if err != nil {
 			err = b.notifier.Wrap(ctx, err, "unable to read parse xkcdump.json as JSON")
 			return
@@ -57,41 +57,43 @@ func (b *twitchBot) handleXkcd(msg *twitch.PrivateMessage) error {
 	}
 
 	scores := map[int]int{}
-	for _, comic := range xkcdDump {
+	for _, comic := range b.xkcdData {
 		// title has a weight of 10
 		// Transcript has a weight of 3
 		// alt has a weight of 1
+
+		// TODO: Be smarter here -- ignore new lines, punctuation etc. Probably
+		// have to break out the ol' regex
 		wordsTitle, wordsTranscript, wordsAlt := strings.Split(comic.SafeTitle, " "), strings.Split(comic.Transcript, " "), strings.Split(comic.Alt, " ")
 		for _, word := range wordsTitle {
-			if word == arg {
+			if strings.ToLower(word) == arg {
 				scores[comic.Num] += 10
 			}
 		}
 		for _, word := range wordsTranscript {
-			if word == arg {
+			if strings.ToLower(word) == arg {
 				scores[comic.Num] += 3
 			}
 		}
 		for _, word := range wordsAlt {
-			if word == arg {
+			if strings.ToLower(word) == arg {
 				scores[comic.Num] += 1
 			}
 		}
 	}
 
-	max := 404
-	currentMaxScore := 0
-	for num, score := range scores {
-		if score > currentMaxScore {
-			currentMaxScore = score
-			max = num
+	mostRelevantComic, maxScore := 404, 0
+	for comicNum, score := range scores {
+		if score > maxScore {
+			maxScore, mostRelevantComic = score, comicNum
 		}
 	}
-	if max == 404 {
+
+	if mostRelevantComic == 404 {
 		b.respond("There isn't an XKCD for that: https://xkcd.com/404")
 		return nil
 	}
 
-	b.respond("There's an xkcd for that: " + fmt.Sprintf(linkFormat, max))
+	b.respond("There's an xkcd for that: " + fmt.Sprintf(linkFormat, mostRelevantComic))
 	return nil
 }
