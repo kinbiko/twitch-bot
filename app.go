@@ -28,6 +28,7 @@ func (b *twitchBot) setUpHandlers() {
 	h["!unpopularopinion"] = b.handleUnpopularOpinion
 	h["!dotfiles"] = b.handleDotfiles
 	h["!twitter"] = b.handleTwitter
+	h["!discord"] = b.handleDiscord
 	b.handlers = h
 }
 
