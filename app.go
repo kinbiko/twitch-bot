@@ -13,7 +13,8 @@ import (
 )
 
 type twitchBot struct {
-	client *twitch.Client
+	client      *twitch.Client
+	channelName string
 	*logrus.Logger
 	notifier          *bugsnag.Notifier
 	env               map[string]string
@@ -40,10 +41,10 @@ func Start() error {
 	}
 
 	bot := &twitchBot{
-		client:   client,
-		Logger:   logrus.New(),
-		notifier: n,
-		env:      env,
+		client:      client,
+		channelName: env["CHANNEL_NAME"],
+		Logger:      logrus.New(),
+		notifier:    n,
 		unpopularOpinions: []string{
 			"consistency is overrated",
 			"ship on Fridays",
@@ -60,7 +61,7 @@ func Start() error {
 }
 
 func (b *twitchBot) respond(msg string) {
-	b.client.Say(b.env["CHANNEL_NAME"], msg)
+	b.client.Say(b.channelName, msg)
 }
 
 // !unpopularopinion
