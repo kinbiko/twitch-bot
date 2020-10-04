@@ -29,6 +29,7 @@ func (b *twitchBot) setUpHandlers() {
 	h["!dotfiles"] = b.handleDotfiles
 	h["!twitter"] = b.handleTwitter
 	h["!discord"] = b.handleDiscord
+	h["!github"] = b.handleGitHub
 	b.handlers = h
 }
 

@@ -4,10 +4,10 @@ import "math/rand"
 
 func unpopularOpinions() []string {
 	return []string{
-		"consistency is overrated",
-		"ship on Fridays",
+		"Consistency is overrated",
+		"Ship on Fridays",
 		"TDD",
-		"best practices are harmful",
+		"Best practices are harmful",
 	}
 }
 
