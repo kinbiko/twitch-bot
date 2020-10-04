@@ -28,14 +28,15 @@ func (b *twitchBot) respond(msg string) {
 
 func (b *twitchBot) setUpHandlers() {
 	h := map[string]func(msg *twitch.PrivateMessage) error{}
-	h["!unpopularopinion"] = b.handleUnpopularOpinion
-	h["!dotfiles"] = b.handleDotfiles
-	h["!twitter"] = b.handleTwitter
-	h["!discord"] = b.handleDiscord
-	h["!github"] = b.handleGitHub
-	h["!social"] = b.handleSocial
 	h["!commands"] = b.handleCommands
+	h["!discord"] = b.handleDiscord
+	h["!dotfiles"] = b.handleDotfiles
+	h["!github"] = b.handleGitHub
+	h["!phonenumber"] = b.handlePhoneNumber
 	h["!so"] = b.handleSo
+	h["!social"] = b.handleSocial
+	h["!twitter"] = b.handleTwitter
+	h["!unpopularopinion"] = b.handleUnpopularOpinion
 	h["!xkcd"] = b.handleXKCD
 	b.handlers = h
 }
