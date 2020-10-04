@@ -1,18 +1,19 @@
 package main
 
-import "math/rand"
+import (
+	"math/rand"
 
-func unpopularOpinions() []string {
-	return []string{
+	"github.com/gempir/go-twitch-irc/v2"
+)
+
+// !unpopularopinion
+func (b *twitchBot) handleUnpopularOpinion(_ *twitch.PrivateMessage) error {
+	opinions := []string{
 		"Consistency is overrated",
 		"Ship on Fridays",
 		"TDD",
 		"Best practices are harmful",
 	}
-}
-
-// !unpopularopinion
-func (b *twitchBot) handleUnpopularOpinion(_ []string) error {
-	b.respond(b.unpopularOpinions[rand.Intn(len(b.unpopularOpinions))])
+	b.respond(opinions[rand.Intn(len(opinions))])
 	return nil
 }

@@ -13,10 +13,9 @@ type twitchBot struct {
 	client      *twitch.Client
 	channelName string
 	*logrus.Logger
-	notifier          *bugsnag.Notifier
-	env               map[string]string
-	handlers          map[string]func(args []string) error
-	unpopularOpinions []string
+	notifier *bugsnag.Notifier
+	env      map[string]string
+	handlers map[string]func(msg *twitch.PrivateMessage) error
 }
 
 func (b *twitchBot) respond(msg string) {
@@ -24,7 +23,7 @@ func (b *twitchBot) respond(msg string) {
 }
 
 func (b *twitchBot) setUpHandlers() {
-	h := map[string]func(args []string) error{}
+	h := map[string]func(msg *twitch.PrivateMessage) error{}
 	h["!unpopularopinion"] = b.handleUnpopularOpinion
 	h["!dotfiles"] = b.handleDotfiles
 	h["!twitter"] = b.handleTwitter
@@ -32,6 +31,7 @@ func (b *twitchBot) setUpHandlers() {
 	h["!github"] = b.handleGitHub
 	h["!social"] = b.handleSocial
 	h["!commands"] = b.handleCommands
+	h["!so"] = b.handleSo
 	b.handlers = h
 }
 
@@ -45,7 +45,7 @@ func (b *twitchBot) onChatMsg(msg twitch.PrivateMessage) {
 	if !ok {
 		return // no handler in this case
 	}
-	if err := handler(split[1:]); err != nil {
+	if err := handler(&msg); err != nil {
 		b.notifier.Notify(ctx, err)
 	}
 }

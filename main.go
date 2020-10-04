@@ -36,11 +36,10 @@ func start() error {
 	}
 
 	bot := &twitchBot{
-		client:            client,
-		channelName:       env["CHANNEL_NAME"],
-		Logger:            logrus.New(),
-		notifier:          n,
-		unpopularOpinions: unpopularOpinions(),
+		client:      client,
+		channelName: env["CHANNEL_NAME"],
+		Logger:      logrus.New(),
+		notifier:    n,
 	}
 	bot.setUpHandlers()
 
