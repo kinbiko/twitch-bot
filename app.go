@@ -1,4 +1,4 @@
-package bot
+package main
 
 import (
 	"context"
@@ -20,44 +20,6 @@ type twitchBot struct {
 	env               map[string]string
 	handlers          map[string]func(args []string) error
 	unpopularOpinions []string
-}
-
-func Start() error {
-	env, err := readEnv()
-	if err != nil {
-		return err
-	}
-
-	client := twitch.NewClient(env["BOT_USERNAME"], env["OAUTH_TOKEN"])
-
-	n, err := bugsnag.New(bugsnag.Configuration{
-		APIKey:       env["BUGSNAG_API_KEY"],
-		AppVersion:   "0.0.1-dev",
-		ReleaseStage: "dev",
-	})
-
-	if err != nil {
-		return err
-	}
-
-	bot := &twitchBot{
-		client:      client,
-		channelName: env["CHANNEL_NAME"],
-		Logger:      logrus.New(),
-		notifier:    n,
-		unpopularOpinions: []string{
-			"consistency is overrated",
-			"ship on Fridays",
-			"TDD",
-			"best practices are harmful",
-		},
-	}
-	bot.setUpHandlers()
-
-	client.OnPrivateMessage(bot.onChatMsg)
-	client.Join(env["CHANNEL_NAME"])
-	bot.Info("starting bot...")
-	return client.Connect() // this line blocks
 }
 
 func (b *twitchBot) respond(msg string) {
