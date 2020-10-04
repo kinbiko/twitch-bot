@@ -1,0 +1,18 @@
+package main
+
+import "math/rand"
+
+func unpopularOpinions() []string {
+	return []string{
+		"consistency is overrated",
+		"ship on Fridays",
+		"TDD",
+		"best practices are harmful",
+	}
+}
+
+// !unpopularopinion
+func (b *twitchBot) handleUnpopularOpinion(_ []string) error {
+	b.respond(b.unpopularOpinions[rand.Intn(len(b.unpopularOpinions))])
+	return nil
+}
