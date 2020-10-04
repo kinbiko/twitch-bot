@@ -16,8 +16,8 @@ type xkcdData struct {
 }
 
 func main() {
-	data := make([]*xkcdData, 2367)
-	for i := 1; i <= 2367; i++ {
+	data := make([]*xkcdData, 2367-404)
+	for i := 405; i <= 2367; i++ {
 		apiEndpoint := fmt.Sprintf("https://xkcd.com/%d/info.0.json", i)
 		resp, err := http.Get(apiEndpoint)
 		if err != nil {
@@ -38,6 +38,6 @@ func main() {
 			panic(err)
 		}
 		fmt.Printf("completed %d comic metadata grabs\n", i)
-		time.Sleep(1 * time.Second)
+		time.Sleep(100 * time.Millisecond)
 	}
 }

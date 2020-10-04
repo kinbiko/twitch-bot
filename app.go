@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"strings"
+	"sync"
 
 	"github.com/gempir/go-twitch-irc/v2"
 	"github.com/kinbiko/bugsnag"
@@ -16,6 +17,9 @@ type twitchBot struct {
 	notifier *bugsnag.Notifier
 	env      map[string]string
 	handlers map[string]func(msg *twitch.PrivateMessage) error
+
+	xkcdOnce sync.Once
+	xkcdData []*xkcdData
 }
 
 func (b *twitchBot) respond(msg string) {
@@ -32,6 +36,7 @@ func (b *twitchBot) setUpHandlers() {
 	h["!social"] = b.handleSocial
 	h["!commands"] = b.handleCommands
 	h["!so"] = b.handleSo
+	h["!xkcd"] = b.handleXkcd
 	b.handlers = h
 }
 
