@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/gempir/go-twitch-irc/v2"
 	"github.com/kinbiko/bugsnag"
 	"github.com/sirupsen/logrus"
@@ -20,15 +21,29 @@ type twitchBot struct {
 	xkcdData []*xkcdData
 }
 
+var (
+	blue   = color.New(color.FgBlue, color.Bold).SprintfFunc()
+	red    = color.New(color.FgRed, color.Bold).SprintfFunc()
+	yellow = color.New(color.FgYellow, color.Bold).SprintfFunc()
+)
+
 func (b *twitchBot) respond(msg string) {
-	b.Infof("%s: %s", b.userName, msg)
+	b.Infof("%s: %s", blue(b.userName), msg)
 	b.client.Say(b.channelName, msg)
 }
 
 func (b *twitchBot) onChatMsg(msg twitch.PrivateMessage) {
 	ctx := b.notifier.WithUser(context.Background(), bugsnag.User{Name: msg.User.Name, ID: msg.User.ID})
 	ctx = b.notifier.WithMetadatum(ctx, "chat", "message", msg.Message)
-	b.Infof("%s: %s\n", msg.User.Name, msg.Message)
+
+	col := yellow
+	switch msg.User.Name {
+	case "kinbiko":
+		col = red
+	case "kinbikobot":
+		col = blue
+	}
+	b.Infof("%s: %s\n", col(msg.User.Name), msg.Message)
 
 	split := strings.Split(msg.Message, " ")
 	ctx = b.notifier.WithBugsnagContext(ctx, split[0])
