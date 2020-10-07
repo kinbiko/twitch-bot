@@ -38,10 +38,11 @@ func start() error {
 	bot := &twitchBot{
 		client:      client,
 		channelName: env["CHANNEL_NAME"],
+		userName:    env["BOT_USERNAME"],
 		Logger:      logrus.New(),
 		notifier:    n,
 	}
-	bot.setUpHandlers()
+	bot.setUpRoutes()
 
 	client.OnPrivateMessage(bot.onChatMsg)
 	client.Join(env["CHANNEL_NAME"])

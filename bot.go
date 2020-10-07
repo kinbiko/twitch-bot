@@ -13,6 +13,7 @@ import (
 type twitchBot struct {
 	client      *twitch.Client
 	channelName string
+	userName    string
 	*logrus.Logger
 	notifier *bugsnag.Notifier
 	env      map[string]string
@@ -23,22 +24,8 @@ type twitchBot struct {
 }
 
 func (b *twitchBot) respond(msg string) {
+	b.Infof("%s: %s", b.userName, msg)
 	b.client.Say(b.channelName, msg)
-}
-
-func (b *twitchBot) setUpHandlers() {
-	h := map[string]func(msg *twitch.PrivateMessage) error{}
-	h["!commands"] = b.handleCommands
-	h["!discord"] = b.handleDiscord
-	h["!dotfiles"] = b.handleDotfiles
-	h["!github"] = b.handleGitHub
-	h["!phonenumber"] = b.handlePhoneNumber
-	h["!so"] = b.handleSo
-	h["!social"] = b.handleSocial
-	h["!twitter"] = b.handleTwitter
-	h["!unpopularopinion"] = b.handleUnpopularOpinion
-	h["!xkcd"] = b.handleXKCD
-	b.handlers = h
 }
 
 func (b *twitchBot) onChatMsg(msg twitch.PrivateMessage) {
