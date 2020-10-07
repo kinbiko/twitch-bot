@@ -20,12 +20,25 @@ type xkcdData struct {
 
 const linkFormat = "https://xkcd.com/%d/"
 
-func (b *twitchBot) handleXKCD(msg *twitch.PrivateMessage) error {
-	var (
-		ctx = context.Background()
-		err error
-	)
+func (b *twitchBot) setupXKCD(ctx context.Context) error {
+	jsonFile, err := os.Open("./xkcdump.json")
+	if err != nil {
+		return b.notifier.Wrap(ctx, err, "unable to open xkcdump.json")
+	}
+	defer jsonFile.Close()
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return b.notifier.Wrap(ctx, err, "unable to read xkcdump.json file")
+	}
 
+	err = json.Unmarshal(byteValue, &b.xkcdData)
+	if err != nil {
+		return b.notifier.Wrap(ctx, err, "unable to read parse xkcdump.json as JSON")
+	}
+	return nil
+}
+
+func (b *twitchBot) handleXKCD(msg *twitch.PrivateMessage) error {
 	args := strings.Split(msg.Message, " ")
 	if len(args) < 2 {
 		b.respond("There's no XKCD for that: https://xkcd.com/404")
@@ -33,43 +46,8 @@ func (b *twitchBot) handleXKCD(msg *twitch.PrivateMessage) error {
 	}
 	arg := strings.ToLower(args[1])
 
-	b.xkcdOnce.Do(func() {
-		jsonFile, err := os.Open("./xkcdump.json")
-		if err != nil {
-			err = b.notifier.Wrap(ctx, err, "unable to open xkcdump.json")
-			return
-		}
-		defer jsonFile.Close()
-		byteValue, err := ioutil.ReadAll(jsonFile)
-		if err != nil {
-			err = b.notifier.Wrap(ctx, err, "unable to read xkcdump.json file")
-			return
-		}
-
-		err = json.Unmarshal(byteValue, &b.xkcdData)
-		if err != nil {
-			err = b.notifier.Wrap(ctx, err, "unable to read parse xkcdump.json as JSON")
-			return
-		}
-	})
-	if err != nil {
-		return err
-	}
-
-	mostRelevantComic := calculateMostRelevantComic(arg, b.xkcdData)
-
-	if mostRelevantComic == 404 {
-		b.respond("There isn't an XKCD for that: https://xkcd.com/404")
-		return nil
-	}
-
-	b.respond("There's an xkcd for that: " + fmt.Sprintf(linkFormat, mostRelevantComic))
-	return nil
-}
-
-func calculateMostRelevantComic(arg string, data []*xkcdData) int {
 	scores := map[int]int{}
-	for _, comic := range data {
+	for _, comic := range b.xkcdData {
 		// title has a weight of 10
 		// Transcript has a weight of 3
 		// alt has a weight of 1
@@ -98,5 +76,11 @@ func calculateMostRelevantComic(arg string, data []*xkcdData) int {
 		}
 	}
 
-	return mostRelevantComic
+	if mostRelevantComic == 404 {
+		b.respond("There isn't an XKCD for that: https://xkcd.com/404")
+		return nil
+	}
+
+	b.respond("There's an xkcd for that: " + fmt.Sprintf(linkFormat, mostRelevantComic))
+	return nil
 }

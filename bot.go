@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"strings"
-	"sync"
 
 	"github.com/gempir/go-twitch-irc/v2"
 	"github.com/kinbiko/bugsnag"
@@ -19,7 +18,6 @@ type twitchBot struct {
 	env      map[string]string
 	handlers map[string]func(msg *twitch.PrivateMessage) error
 
-	xkcdOnce sync.Once
 	xkcdData []*xkcdData
 }
 

@@ -9,7 +9,7 @@ import (
 
 func (b *twitchBot) handleSo(msg *twitch.PrivateMessage) error {
 	if name := msg.User.Name; name != b.channelName {
-		return fmt.Errorf("!so can only be invoked by %s, but was invoked by", b.channelName, name)
+		return fmt.Errorf("!so can only be invoked by %s, but was invoked by %s", b.channelName, name)
 	}
 	args := strings.Split(msg.Message, " ")
 	if l := len(args); l != 2 {

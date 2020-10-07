@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -11,13 +12,13 @@ import (
 )
 
 func main() {
-	if err := start(); err != nil {
+	if err := start(context.Background()); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}
 }
 
-func start() error {
+func start(ctx context.Context) error {
 	env, err := readEnv()
 	if err != nil {
 		return err
@@ -46,7 +47,11 @@ func start() error {
 
 	client.OnPrivateMessage(bot.onChatMsg)
 	client.Join(env["CHANNEL_NAME"])
-	bot.Info("starting bot...")
+	bot.Info("bot staring...")
+	if err := bot.setupXKCD(ctx); err != nil {
+		return err
+	}
+	bot.Info("bot initialised.")
 	return client.Connect() // this line blocks
 }
 
