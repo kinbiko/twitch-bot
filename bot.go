@@ -15,7 +15,6 @@ type twitchBot struct {
 	userName    string
 	*logrus.Logger
 	notifier *bugsnag.Notifier
-	env      map[string]string
 	handlers map[string]func(msg *twitch.PrivateMessage) error
 
 	xkcdData []*xkcdData
@@ -28,10 +27,11 @@ func (b *twitchBot) respond(msg string) {
 
 func (b *twitchBot) onChatMsg(msg twitch.PrivateMessage) {
 	ctx := b.notifier.WithUser(context.Background(), bugsnag.User{Name: msg.User.Name, ID: msg.User.ID})
-	// Print the message in the console
+	ctx = b.notifier.WithMetadatum(ctx, "chat", "message", msg.Message)
 	b.Infof("%s: %s\n", msg.User.Name, msg.Message)
 
 	split := strings.Split(msg.Message, " ")
+	ctx = b.notifier.WithBugsnagContext(ctx, split[0])
 	handler, ok := b.handlers[split[0]]
 	if !ok {
 		return // no handler in this case
