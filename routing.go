@@ -14,6 +14,7 @@ func (b *twitchBot) setUpRoutes() {
 
 		// Commands with a bit more meat
 		"!commands":         b.handleCommands,
+		"!lurk":             b.handleLurk,
 		"!so":               b.handleSo,
 		"!unpopularopinion": b.handleUnpopularOpinion,
 		"!xkcd":             b.handleXKCD,
